@@ -1,4 +1,4 @@
-name: docker-php-nginx-postgres-composer
+name: app
 
 services:
     nginx:
@@ -17,7 +17,9 @@ services:
         restart: always
         environment:
             - DB_DRIVER=pgsql
-            - DB_HOST=postgres
+            # - DB_DRIVER=mysql
+            - DB_HOST=pgsql
+            # - DB_HOST=mysql
             - DB_NAME=${DB_NAME}
             - DB_USER=${DB_USER}
             - DB_PASSWORD=${DB_PASSWORD}
@@ -25,7 +27,8 @@ services:
             - ./.docker/conf/php/php.ini:/usr/local/etc/php/conf.d/php.ini
             - .:/var/www/html
         depends_on:
-            - postgres
+            - pgsql
+            # - mysql
     
     composer:
         image: composer
@@ -33,7 +36,7 @@ services:
             - .:/app
         command: install
     
-    postgres:
+    pgsql:
         image: postgres:17
         restart: always
         environment:
@@ -43,7 +46,21 @@ services:
         ports:
             - 5432:5432
         volumes:
-            - pg_data:/var/lib/postgresql/data
+            - pgsql_data:/var/lib/postgresql/data
+
+    # mysql:
+    #     image: mysql:9
+    #     restart: always
+    #     environment:
+    #         - MYSQL_DATABASE=${DB_NAME}
+    #         - MYSQL_USER=${DB_USER}
+    #         - MYSQL_PASSWORD=${DB_PASSWORD}
+    #         - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+    #     ports:
+    #         - 3306:3306
+    #     volumes:
+    #         - mysql_data:/var/lib/mysql
 
 volumes:
-    pg_data:
+    pgsql_data:
+    # mysql_data:
